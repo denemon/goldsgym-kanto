@@ -17,13 +17,14 @@ https://denemon.github.io/goldsgym-kanto/
 
 | ファイル | 役割 |
 |----------|------|
-| `index.html` / `app.js` | 店舗マップ |
-| `zone.html` / `zone.js` | 15分圏マップ |
-| `styles.css` | 黄色グラデーションのデザイン（両ページ共通） |
-| `gyms.json` | 店舗データ（店名・最寄り駅・住所・座標）。**ここだけ直せばデータ更新できる** |
+| `index.html` / `assets/js/app.js` | 店舗マップ |
+| `zone.html` / `assets/js/zone.js` | 15分圏マップ |
+| `assets/css/styles.css` | 黄色グラデーションのデザイン（両ページ共通） |
+| `assets/data/gyms.json` | 店舗データ（店名・最寄り駅・住所・座標）。**ここだけ直せばデータ更新できる** |
+| `assets/images/` | 画像アセット置き場 |
 
 地図の背景は [Leaflet](https://leafletjs.com/) + OpenStreetMap（無料・APIキー不要）。
-店舗位置などの「事前に用意した情報」は `gyms.json` に持たせ、その上に描画する構成です。
+店舗位置などの「事前に用意した情報」は `assets/data/gyms.json` に持たせ、その上に描画する構成です。
 
 ## ローカルで動かす
 
@@ -36,6 +37,6 @@ python3 -m http.server 8000
 
 ## データ更新
 
-`gyms.json` の各店舗オブジェクトを編集するだけ。座標(`lat`/`lng`)は国土地理院ジオコーディング
+`assets/data/gyms.json` の各店舗オブジェクトを編集するだけ。座標(`lat`/`lng`)は国土地理院ジオコーディング
 （住所→座標）で取得した値で、番地レベルの中心点のため建物と数十m程度ずれる場合があります。
 ピンポイントに合わせたい場合は `lat`/`lng` を個別に書き換えてください。

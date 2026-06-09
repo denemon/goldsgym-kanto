@@ -3,6 +3,8 @@
 // ※ 直線距離ベースの概算。実際の道路・地形は考慮しない。
 
 const PREF_ORDER = ["東京都", "神奈川県", "千葉県", "埼玉県"];
+const DATA_PATH = "assets/data/gyms.json";
+const DATA_FALLBACK_URL = "https://denemon.github.io/goldsgym-kanto/assets/data/gyms.json";
 
 // 15分あたりの移動速度（m/分）→ 半径(m)
 const MODES = {
@@ -129,11 +131,33 @@ function injectGradient() {
   svg.insertBefore(defs, svg.firstChild);
 }
 
+async function loadGymData() {
+  const urls = [...new Set([DATA_PATH, new URL(DATA_PATH, document.baseURI).href, DATA_FALLBACK_URL])];
+  let lastError;
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: "no-cache" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+
+      const data = await res.json();
+      if (!Array.isArray(data.gyms) || data.gyms.length === 0) {
+        throw new Error(`Invalid gyms data: ${url}`);
+      }
+      return data.gyms;
+    } catch (e) {
+      lastError = e;
+      console.warn("店舗データの読み込みを再試行します:", e);
+    }
+  }
+
+  throw lastError || new Error("店舗データの読み込みに失敗しました。");
+}
+
 async function init() {
   try {
-    const res = await fetch("gyms.json");
-    const data = await res.json();
-    allGyms = data.gyms.slice().sort((a, b) => PREF_ORDER.indexOf(a.pref) - PREF_ORDER.indexOf(b.pref));
+    const gyms = await loadGymData();
+    allGyms = gyms.slice().sort((a, b) => PREF_ORDER.indexOf(a.pref) - PREF_ORDER.indexOf(b.pref));
 
     populateSelect();
     renderModeTabs();

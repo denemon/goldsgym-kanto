@@ -1,7 +1,9 @@
 // ゴールドジム MAP（東京・神奈川・千葉・埼玉）
-// gyms.json を読み込み → Leaflet地図にマーカー描画 + サイドバー一覧 + 絞り込み
+// assets/data/gyms.json を読み込み → Leaflet地図にマーカー描画 + サイドバー一覧 + 絞り込み
 
 const PREF_ORDER = ["東京都", "神奈川県", "千葉県", "埼玉県"];
+const DATA_PATH = "assets/data/gyms.json";
+const DATA_FALLBACK_URL = "https://denemon.github.io/goldsgym-kanto/assets/data/gyms.json";
 const markers = new Map(); // gym.name -> Leaflet marker
 let allGyms = [];
 let activePref = "all";
@@ -123,12 +125,34 @@ function applyFilters(fit = false) {
   if (fit) fitTo(filtered); // 検索入力では地図を動かさない（都県切替・24hフィルタ時のみフィット）
 }
 
+async function loadGymData() {
+  const urls = [...new Set([DATA_PATH, new URL(DATA_PATH, document.baseURI).href, DATA_FALLBACK_URL])];
+  let lastError;
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: "no-cache" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+
+      const data = await res.json();
+      if (!Array.isArray(data.gyms) || data.gyms.length === 0) {
+        throw new Error(`Invalid gyms data: ${url}`);
+      }
+      return data.gyms;
+    } catch (e) {
+      lastError = e;
+      console.warn("店舗データの読み込みを再試行します:", e);
+    }
+  }
+
+  throw lastError || new Error("店舗データの読み込みに失敗しました。");
+}
+
 async function init() {
   try {
-    const res = await fetch("gyms.json");
-    const data = await res.json();
+    const gyms = await loadGymData();
     // 都県順 → その中は元の並びを維持
-    allGyms = data.gyms.slice().sort((a, b) => PREF_ORDER.indexOf(a.pref) - PREF_ORDER.indexOf(b.pref));
+    allGyms = gyms.slice().sort((a, b) => PREF_ORDER.indexOf(a.pref) - PREF_ORDER.indexOf(b.pref));
     buildMarkers(allGyms);
     renderPrefTabs();
     renderList(allGyms);
