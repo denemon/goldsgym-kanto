@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ゴールドジム 15分圏マップ</title>
+  <meta name="description" content="店舗から徒歩・自転車・車で15分圏内をゾーン表示" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark">GOLD'S</span>
+      <h1>15分圏マップ</h1>
+    </div>
+    <div class="header-controls">
+      <a class="nav-link" href="index.html">← 店舗マップ</a>
+      <select id="store-select" class="store-select"></select>
+      <div id="mode-tabs" class="pref-tabs zone-mode-tabs"></div>
+      <label class="toggle">
+        <input type="checkbox" id="show-all" />
+        <span>全店まとめて表示</span>
+      </label>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div id="map" class="map map-full"></div>
+  </main>
+
+  <script src="zone.js"></script>
+</body>
+</html>
